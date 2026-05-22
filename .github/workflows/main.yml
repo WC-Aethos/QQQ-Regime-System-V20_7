@@ -1,0 +1,28 @@
+name: Run Market Regime Agent V20.7
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 22 * * 1-5"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Python agent
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          TIMEZONE: Asia/Taipei
+          YFINANCE_RETRIES: "3"
+          YFINANCE_BACKOFF_SECONDS: "5,15,45"
+          QQQ_INCREMENTAL_PERIOD: "7d"
+        run: python market_regime_agent.py
